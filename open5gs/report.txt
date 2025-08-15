@@ -1,0 +1,216 @@
+#!/bin/bash
+
+echo "=== Starting Traffic Generation and Monitoring ==="
+
+# Define UE interfaces and IPs
+BROWSE_IF="uesimtun0"
+VIDEO_IF="uesimtun2"
+IOT_IF="uesimtun1"
+
+BROWSE_IP="10.45.0.9"
+IOT_IP="10.45.0.10"
+VIDEO_IP="10.45.0.11"
+
+# -----------------------
+# Browsing traffic (simulated by periodic curl)
+# -----------------------
+echo "[INFO] Starting Browsing Traffic on $BROWSE_IF ($BROWSE_IP)..."
+for i in {1..5}; do
+    curl --interface $BROWSE_IF http://speedtest.tele2.net/100KB.zip --output /dev/null --silent &
+    echo "[DEBUG] curl download triggered on $BROWSE_IF (Iteration $i)"
+    sleep 2
+done
+
+# -----------------------
+# Start iperf3 server (in background)
+# -----------------------
+echo "[INFO] Starting iperf3 Server in background..."
+iperf3 -s -p 5201 > /dev/null 2>&1 &
+sleep 2  # Wait for server to start
+
+# -----------------------
+# Video traffic (iperf3 client from VIDEO_IF)
+# -----------------------
+echo "[INFO] Starting Video Traffic on $VIDEO_IF ($VIDEO_IP)..."
+iperf3 -c 127.0.0.1 -B $VIDEO_IP -t 15 -p 5201 > /dev/null 2>&1 &
+echo "[DEBUG] iperf3 launched on $VIDEO_IF with bind IP $VIDEO_IP"
+
+# -----------------------
+# IoT traffic (ping loop from IOT_IF)
+# -----------------------
+echo "[INFO] Starting IoT ping loop on $IOT_IF ($IOT_IP)..."
+for i in {1..10}; do
+    ping -I $IOT_IF -c 1 8.8.8.8 > /dev/null 2>&1
+    echo "[DEBUG] Ping sent from $IOT_IF (Iteration $i)"
+    sleep 1
+done
+
+# -----------------------
+# Launch traffic monitor script
+# -----------------------
+echo "[INFO] Launching traffic monitor (traffic.py)..."
+python3 traffic.py &
+
+# -----------------------
+# Wait for monitor or kill manually
+# -----------------------
+echo "[INFO] Monitoring running in background. Press Ctrl+C to stop manually."
+wait
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import time
+import psutil
+import csv
+from datetime import datetime
+
+# Define interfaces and slice labels
+interfaces = {
+    "uesimtun0": "Browsing",
+    "uesimtun1": "IoT",
+    "uesimtun2": "Video"
+}
+
+output_file = "traffic_log.csv"
+
+# Initialize counters
+prev_bytes = {}
+
+print("[DEBUG] Starting traffic monitor...")
+
+# Header for CSV
+with open(output_file, mode='w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(["Timestamp", "Interface", "Slice", "RX_Bytes", "TX_Bytes"])
+
+try:
+    for _ in range(30):  # Run only for 30 seconds
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        counters = psutil.net_io_counters(pernic=True)
+
+        for iface, slice_type in interfaces.items():
+            rx = counters[iface].bytes_recv
+            tx = counters[iface].bytes_sent
+
+            # Calculate deltas (for debugging)
+            prev_rx, prev_tx = prev_bytes.get(iface, (rx, tx))
+            delta_rx = rx - prev_rx
+            delta_tx = tx - prev_tx
+            prev_bytes[iface] = (rx, tx)
+
+            print(f"[DEBUG] {iface} ({slice_type}): RX={delta_rx}, TX={delta_tx}")
+
+            with open(output_file, mode='a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([timestamp, iface, slice_type, delta_rx, delta_tx])
+
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    print("\n[INFO] Traffic monitor stopped by user.")
+
+print("[INFO] Traffic logging complete.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ip addr show uesimtun0
+ip addr show uesimtun1
+ip addr show uesimtun2
+
+
+iperf3 -c <server_ip> -B 10.45.0.2  # or .3 or .4
+
+
+🔹 3. IoT-Type Traffic (uesimtun1)
+
+IoT traffic is usually low and periodic:
+
+while true; do
+    ping -I uesimtun1 -c 1 8.8.8.8
+    sleep 5
+done
+
+    Sends small pings every 5 seconds to mimic periodic sensor data.
+
+
+
+Then, from UE (bind to tunnel interface IP):
+
+iperf3 -c 127.0.0.1 --bind 10.45.0.7 -t 20 -b 10M
+
+    This will simulate a UE sending video traffic over uesimtun2.
+    
+    
+    
+    
+    
+    
+    🔹 1. Browsing Traffic (uesimtun0)
+
+Run this in another terminal:
+
+curl --interface uesimtun0 http://example.com
+
+
+
+

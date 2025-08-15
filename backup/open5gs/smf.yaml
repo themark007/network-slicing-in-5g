@@ -1,0 +1,133 @@
+logger:
+  file:
+    path: /var/log/open5gs/smf.log
+
+global:
+  max:
+    ue: 1024
+
+smf:
+  slices:
+    - slice_id: "1"
+      slice_type: "eMBB"
+      qos_profile:
+        max_dl_bitrate: 1000Mbps
+        max_ul_bitrate: 1000Mbps
+    - slice_id: "2"
+      slice_type: "URLLC"
+      qos_profile:
+        max_dl_bitrate: 100Mbps
+        max_ul_bitrate: 100Mbps
+    - slice_id: "3"
+      slice_type: "mMTC"
+      qos_profile:
+        max_dl_bitrate: 50Mbps
+        max_ul_bitrate: 50Mbps
+    - slice_id: "4"
+      slice_type: "Custom"
+      qos_profile:
+        max_dl_bitrate: 500Mbps
+        max_ul_bitrate: 500Mbps
+
+  sbi:
+    server:
+      - address: 127.0.0.4
+        port: 7777
+    client:
+      scp:
+        - uri: http://127.0.0.200:7777
+
+  pfcp:
+    server:
+      - address: 127.0.0.4
+    client:
+      upf:
+        - address: 127.0.0.7
+
+  gtpc:
+    server:
+      - address: 127.0.0.4
+
+  gtpu:
+    server:
+      - address: 127.0.0.4
+
+  metrics:
+    server:
+      - address: 127.0.0.4
+        port: 9090
+
+  session:
+    - subnet: 10.45.0.0/16
+      gateway: 10.45.0.1
+      dnn: internet
+    - subnet: 10.46.0.0/16
+      gateway: 10.46.0.1
+      dnn: ims
+    - subnet: 2001:db8:cafe::/48
+      gateway: 2001:db8:cafe::1
+      dnn: internet
+    - subnet: 2001:db8:babe::/48
+      gateway: 2001:db8:babe::1
+      dnn: ims
+
+  dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    - 2001:4860:4860::8888
+    - 2001:4860:4860::8844
+
+  mtu: 1400
+  freeDiameter: /etc/freeDiameter/smf.conf
+
+info:
+  - s_nssai:
+      sst: 1
+      sd: "000001"
+      dnn:
+        - internet
+        - ims
+  - s_nssai:
+      sst: 2
+      sd: "000002"
+      dnn:
+        - internet
+        - ims
+  - s_nssai:
+      sst: 3
+      sd: "000003"
+      dnn:
+        - internet
+  - s_nssai:
+      sst: 4
+      sd: "000004"
+      dnn:
+        - internet
+  - s_nssai:
+      sst: 1
+      dnn:
+        - internet
+    tai:
+      - plmn_id:
+          mcc: 999
+          mnc: 70
+        tac: 1
+  - s_nssai:
+      sst: 2
+      dnn:
+        - internet
+        - ims
+    tai:
+      - plmn_id:
+          mcc: 999
+          mnc: 70
+        tac: 1-9
+  - s_nssai:
+      sst: 3
+      dnn:
+        - internet
+    tai:
+      - plmn_id:
+          mcc: 999
+          mnc: 70
+        tac: 10-20
