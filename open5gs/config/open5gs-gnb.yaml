@@ -1,0 +1,25 @@
+mcc: '999'
+mnc: '70'
+
+nci: '0x000000010'
+idLength: 32
+tac: 1
+
+linkIp: 192.168.40.102
+ngapIp: 192.168.40.102
+gtpIp: 192.168.40.102
+
+amfConfigs:
+  - address: 192.168.40.102
+    port: 38412
+
+slices:
+  - sst: 1
+    sd: "000001"  # First slice for UE1
+  - sst: 2
+    sd: "000002"  # Second slice for UE2
+  - sst: 3
+    sd: "000003"  # Third slice for UE3
+
+ignoreStreamIds: true
+

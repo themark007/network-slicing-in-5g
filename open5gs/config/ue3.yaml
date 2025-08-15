@@ -1,0 +1,82 @@
+# IMSI number of the UE. IMSI = [MCC|MNC|MSISDN] (In total 15 digits)
+supi: 'imsi-999700000000007'
+
+# Mobile Country Code and Network Code
+mcc: '999'
+mnc: '70'
+
+# SUCI Configuration (Set 0 for Null-Scheme if not used)
+protectionScheme: 0
+homeNetworkPublicKey: '5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650'
+homeNetworkPublicKeyId: 1
+
+# Routing Indicator (Optional)
+routingIndicator: '0000'
+
+# Authentication Credentials
+key: '465B5CE8B199B49FAA5F0A2EE238A6BC'
+op: 'E8ED289DEBA952E4283B54E88E6183CA'
+opType: 'OPC'
+amf: '8000'
+
+# Device Identity (Optional)
+imei: '356938035643803'
+imeiSv: '4370816125816151'
+
+# TUN Interface Subnet
+tunNetmask: '255.255.255.0'
+
+# gNB IPs for RAN Simulation
+gnbSearchList:
+  - 192.168.40.102
+
+# UAC Access Control
+uacAic:
+  mps: false
+  mcs: false
+
+uacAcc:
+  normalClass: 0
+  class11: false
+  class12: false
+  class13: false
+  class14: false
+  class15: false
+
+# Initial PDU Session Configuration
+sessions:
+  - type: 'IPv4'
+    apn: 'internet'
+    slice:
+      sst: 2
+      sd: "000002"
+
+# Configured NSSAI (Only one section, no duplicates)
+configured-nssai:
+  - sst: 2
+    sd: "000002"
+
+# Supported Integrity Algorithms
+integrity:
+  IA1: true
+  IA2: true
+  IA3: true
+
+# Supported Ciphering Algorithms
+ciphering:
+  EA1: true
+  EA2: true
+  EA3: true
+
+# Maximum Data Rate (optional but helps avoid throttling)
+integrityMaxRate:
+  uplink: 'full'
+  downlink: 'full'
+
+# 🚀 Traffic Generation Section (Added)
+traffic:
+  enable: true
+  type: ping
+  remote: 8.8.8.8
+  interval: 1
+
